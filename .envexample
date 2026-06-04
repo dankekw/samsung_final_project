@@ -1,0 +1,5 @@
+# API Alpha Vantage
+ALPHA_VANTAGE_KEY=your_alpha_vantage_api_key_here
+
+# URL ngrok
+SUMM_SERVER_URL=https://xxxx-xxxx-xxxx.ngrok-free.app
