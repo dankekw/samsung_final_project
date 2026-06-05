@@ -27,7 +27,7 @@ def main():
 
     while True:
         fmt.clear_screen()
-        fmt.print_header("FINANCIAL NLP INTELLIGENCE CLI")
+        fmt.print_header("Welcome to CLI")
         
         server_status = "ONLINE" if server_url else "NOT CONFIGURED"
         print(f"Config: Server -> {server_status} | Loaded Articles: {len(downloaded_articles)}")

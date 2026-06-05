@@ -1,2 +1,60 @@
-# samsung_final_project
-AI-powered financial news aggregator and summarizer. Uses fine-tuned BART, PEGASUS, and FinBERT for automated summary generation and sentiment analysis via a CLI interface.
+# Интеллектуальная система анализа финансовых новостей с использованием методов машинного обучения для классификации и суммаризации текста
+Данная программа использует дообученные модели BART, PEGASUS для суммаризации и FinBERT для анализа тональности новостных текстов. \
+\
+Для дообучения была использована следующая модель PEGASUS https://huggingface.co/google/pegasus-xsum \
+Для дообучения была использована следующая модель BART https://huggingface.co/facebook/bart-large-cnn \
+Для дообучения была использована следующая модель FinBERT https://huggingface.co/ProsusAI/finbert
+
+Модели для суммаризации были дообучены на датасете https://huggingface.co/datasets/danidanou/Bloomberg_Financial_News \
+Модель FinBERT дообучена на датасете https://huggingface.co/datasets/nickmuchi/financial-classification
+
+## Запуск проекта 
+Система состоит из двух частей: клентского CLI и серверной части, отвечающей за скачивание и запуск моделей.
+
+### Шаг 1. Запуск сервера (в Google Colab)
+- Создайте новый блокнот в Google Colab и в настройках среды выполнения (Runtime -> Change runtime type) выберите T4 GPU (или любой доступный GPU).
+- Скопируйте блокнот server/server.ipynb в Colab.
+- Замените значение NGROK_TOKEN на ваш личный токен из панели ngrok.com.
+- Запустите все ячейки блокнота. После загрузки моделей в консоли Colab появится строка вида: `https://xxxx-xxxx-xxxx.ngrok-free.app`
+- Скопируйте этот URL и вставте в .env файл.
+
+### Шаг 2. Настройка клиента (на локальном ПК)
+- Откройте папку проекта в VS Code.
+- Перейдите в папку client/, скопируйте файл .envexample и переименуйте его в .env.
+- Откройте .env и заполните переменные:
+```
+ `ALPHA_VANTAGE_KEY` = your_api_key 
+ `SUMM_SERVER_URL` = your_ngrok_server_url
+ ```
+
+### Шаг 3. Создание окружения и установка зависимостей
+Откройте терминал в VS Code и выполните следующие комнды команды:
+- Для Windows:
+
+```Bash
+cd client
+python -m venv venv
+.\venv\Scripts\activate
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+- Для macOS / Linux:
+```Bash
+cd client
+python -m venv venv
+source venv/bin/activate
+python -m pip install --upgrade pip
+pip install -r requirements.txt
+```
+### Шаг 4. Запуск клиентского приложения
+Для запустка проекта дважды кликните по файлу `run_client.bat`
+
+## Интерфейс клиентского приложения
+После запуска программы в консоли откроется интерактивное текстовое меню.
+- Загрузка новостей (Пункт 1). Введите тикер компании (например, TSLA, AAPL, NVDA) и лимит статей. Приложение скачает метаданные новостей и построит таблицу на экране.
+- Чтение оригинальной статьи (Пункт 2). Введите номер статьи из таблицы. Модуль `newspaper3k` в реальном времени распарсит сайт, очистит текст от рекламы/HTML-тегов и выведет чистую статью на экран.
+- Анализ и суммаризация статьи (Пункт 3). Отправляет текст выбранной статьи на сервер в Colab. Сервер вернет:
+    1. Саммари, полученное с помощью модели BART.
+    2. Саммари, полученное с помощью модели PEGASUS.
+    3. Метрики ROUGE (1/2/L) по отношению к эталонному саммари от Alpha Vantage.
+    4. Оценку тональности текста (негативный, нейтральный, позитивный).
